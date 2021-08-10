@@ -17,5 +17,10 @@ public class CoronaSidoInfoVO {
     private Integer localOccCnt;
     private Integer overFlowCnt;
 
+    private String strDeathCnt;
+    private String strDefCnt;
+    private String strIncDec;
     private String strIsolClearCnt;
+    private String strIsolIngCnt;
+    private String strLocalOccCnt;
 }

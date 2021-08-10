@@ -66,12 +66,27 @@ public class CoronaInfoService {
 
         CoronaSidoInfoVO data = mapper.selectCoronaSidoInfoByDate(date);
 
+        Integer deathCnt = data.getDeathCnt();
+        Integer defcnt = data.getDefCnt();
+        Integer incDec = data.getIncDec();
         Integer isolClearCnt = data.getIsolClearCnt();
+        Integer isolIngCnt = data.getIsolIngCnt();
+        Integer localOccCnt = data.getLocalOccCnt();
 
         DecimalFormat dFormatter = new DecimalFormat("###,###");
+        String strDeathCnt = dFormatter.format(deathCnt);
+        String strDefCnt = dFormatter.format(defcnt);
+        String strIncDec = dFormatter.format(incDec);
         String strIsolClearCnt = dFormatter.format(isolClearCnt);
-
+        String strIsolIngCnt = dFormatter.format(isolIngCnt);
+        String strLocalOccCnt = dFormatter.format(localOccCnt);
+        
+        data.setStrDeathCnt(strDeathCnt);
+        data.setStrDefCnt(strDefCnt);
+        data.setStrIncDec(strIncDec);
         data.setStrIsolClearCnt(strIsolClearCnt);
+        data.setStrIsolIngCnt(strIsolIngCnt);
+        data.setStrLocalOccCnt(strLocalOccCnt);
 
         return data;
     }
