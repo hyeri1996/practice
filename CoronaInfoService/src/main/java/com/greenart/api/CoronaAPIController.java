@@ -121,4 +121,48 @@ public class CoronaAPIController {
         if(node == null) return null;
         return node.getNodeValue();
     }
+
+    @GetMapping("/api/corona_sido")
+    public Map<String, Object> getCoronaSidoInfo() throws Exception{
+        Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+        StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson"); /*URL*/
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=3CID6KRU4kjF4jvHanoFBLwycg6Htt86aVfgEOgBmAecshZIcO5EC9UM9FhVGwAX2Zf%2B%2FrxgsJeUfled1zNS0w%3D%3D"); /*Service Key*/
+        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode("20210810", "UTF-8")); /*검색할 생성일 범위의 시작*/
+        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode("20210810", "UTF-8")); /*검색할 생성일 범위의 종료*/
+    
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.parse(urlBuilder.toString());
+
+        doc.getDocumentElement().normalize();
+
+        NodeList nList = doc.getElementsByTagName("item");
+        if(nList.getLength() <= 0) {
+            resultMap.put("status", false);
+            resultMap.put("message", "데이터가 없습니다.");
+            return resultMap;
+        }
+
+        for(int i=0; i<nList.getLength(); i++) {
+            Node node = nList.item(i);
+            Element elem = (Element) node;
+            System.out.println(getTagValue("createDt ", elem)); // 등록 일시
+            System.out.println(getTagValue("deathCnt ", elem)); // 사망자 수
+            System.out.println(getTagValue("defCnt ", elem)); // 누적 확진자 수
+            System.out.println(getTagValue("gubun ", elem)); //  지역
+            System.out.println(getTagValue("incDec ", elem)); // 신규 확진자 수
+            System.out.println(getTagValue("isolClearCnt ", elem)); // 격리 해제 수
+            System.out.println(getTagValue("isolIngCnt ", elem)); // 격리중 환자 수
+            System.out.println(getTagValue("localOccCnt ", elem)); // 지역발생 수
+            System.out.println(getTagValue("overFlowCnt", elem)); // 해외유입 수
+            System.out.println("======================================================");
+        
+    }
+        resultMap.put("status", true);
+        resultMap.put("message", "성공");
+        return resultMap;
+}
+
 }
