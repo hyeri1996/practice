@@ -107,7 +107,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>서울</td>
+                                <td>지역</td>
                                 <td>68,646</td>
                                 <td>359 ▲</td>
                             </tr>

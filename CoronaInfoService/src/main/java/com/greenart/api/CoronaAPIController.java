@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.greenart.service.CoronaInfoService;
 import com.greenart.vo.CoronaInfoVO;
+import com.greenart.vo.CoronaSidoInfoVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +45,7 @@ public class CoronaAPIController {
         Document doc = docBuilder.parse(urlBuilder.toString());
 
         doc.getDocumentElement().normalize();
-        // System.out.println(doc.getDocumentElement().getNodeName());
+        System.out.println(doc.getDocumentElement().getNodeName());
         
         NodeList nList = doc.getElementsByTagName("item");
         if(nList.getLength() <= 0) {
@@ -122,22 +123,23 @@ public class CoronaAPIController {
         return node.getNodeValue();
     }
 
-    @GetMapping("/api/corona_sido")
-    public Map<String, Object> getCoronaSidoInfo() throws Exception{
+    @GetMapping("/api/corona/sido")
+    public Map<String, Object> getCoronaSidoInfo(
+        @RequestParam String startDt, @RequestParam String endDt
+    ) throws Exception{
         Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=3CID6KRU4kjF4jvHanoFBLwycg6Htt86aVfgEOgBmAecshZIcO5EC9UM9FhVGwAX2Zf%2B%2FrxgsJeUfled1zNS0w%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
-        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode("20210810", "UTF-8")); /*검색할 생성일 범위의 시작*/
-        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode("20210810", "UTF-8")); /*검색할 생성일 범위의 종료*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(startDt, "UTF-8")); /*검색할 생성일 범위의 시작*/
+        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode(endDt, "UTF-8")); /*검색할 생성일 범위의 종료*/
     
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         Document doc = docBuilder.parse(urlBuilder.toString());
 
         doc.getDocumentElement().normalize();
-
         NodeList nList = doc.getElementsByTagName("item");
         if(nList.getLength() <= 0) {
             resultMap.put("status", false);
@@ -145,24 +147,46 @@ public class CoronaAPIController {
             return resultMap;
         }
 
-        for(int i=0; i<nList.getLength(); i++) {
-            Node node = nList.item(i);
+        for(int j=0; j<nList.getLength(); j++) {
+            Node node = nList.item(j);
             Element elem = (Element) node;
-            System.out.println(getTagValue("createDt ", elem)); // 등록 일시
-            System.out.println(getTagValue("deathCnt ", elem)); // 사망자 수
-            System.out.println(getTagValue("defCnt ", elem)); // 누적 확진자 수
-            System.out.println(getTagValue("gubun ", elem)); //  지역
-            System.out.println(getTagValue("incDec ", elem)); // 신규 확진자 수
-            System.out.println(getTagValue("isolClearCnt ", elem)); // 격리 해제 수
-            System.out.println(getTagValue("isolIngCnt ", elem)); // 격리중 환자 수
-            System.out.println(getTagValue("localOccCnt ", elem)); // 지역발생 수
-            System.out.println(getTagValue("overFlowCnt", elem)); // 해외유입 수
-            System.out.println("======================================================");
-        
-    }
+
+            // System.out.println(getTagValue("createDt", elem)); // 등록일
+            // System.out.println(getTagValue("deathCnt", elem)); // 사망자 수
+            // System.out.println(getTagValue("defCnt", elem)); // 누적 확진자 수
+            // System.out.println(getTagValue("gubun", elem)); // 지역
+            // // System.out.println(getTagValue("gubunCn", elem)); // 지역 중국어
+            // // System.out.println(getTagValue("gubunEn", elem)); // 지역 영문
+            // System.out.println(getTagValue("incDec", elem)); // 추가 확진자 수
+            // System.out.println(getTagValue("isolClearCnt", elem)); // 누적 격리 해제 수 
+            // System.out.println(getTagValue("isolIngCnt", elem)); // 격리중 환자 수
+            // System.out.println(getTagValue("localOccCnt", elem)); // 지역발생 수
+            // System.out.println(getTagValue("overFlowCnt", elem)); // 해외유입 수
+            // // System.out.println(getTagValue("qurRate", elem)); // 10만명당 발생률
+            // // System.out.println(getTagValue("seq", elem)); // 게시글번호
+            // // System.out.println(getTagValue("stdDay", elem)); // 기준일시
+            // // System.out.println(getTagValue("updateDt", elem)); // 수정일시분초
+            // System.out.println("======================================================");
+            Date dt = new Date();
+            SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            dt = dtFormat.parse(getTagValue("createDt", elem));
+
+            CoronaSidoInfoVO vo = new CoronaSidoInfoVO();
+            vo.setCreateDt(dt);
+            vo.setDeathCnt(Integer.parseInt(getTagValue("deathCnt", elem)));
+            vo.setDefCnt(Integer.parseInt(getTagValue("defCnt", elem)));
+            vo.setGubun(getTagValue("gubun", elem));
+            vo.setIncDec(Integer.parseInt(getTagValue("incDec", elem)));
+            vo.setIsolClearCnt(Integer.parseInt(getTagValue("isolClearCnt", elem)));
+            vo.setIsolIngCnt(Integer.parseInt(getTagValue("isolIngCnt", elem)));
+            vo.setLocalOccCnt(Integer.parseInt(getTagValue("localOccCnt", elem)));
+            vo.setOverFlowCnt(Integer.parseInt(getTagValue("overFlowCnt", elem)));
+            
+            service.insertCoronaSidoInfo(vo);
+        }
         resultMap.put("status", true);
-        resultMap.put("message", "성공");
+        resultMap.put("message", "데이터가 연결되었습니다.");
         return resultMap;
-}
+} 
 
 }

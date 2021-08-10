@@ -7,6 +7,7 @@ import java.util.Date;
 
 import com.greenart.mapper.CoronaInfoMapper;
 import com.greenart.vo.CoronaInfoVO;
+import com.greenart.vo.CoronaSidoInfoVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class CoronaInfoService {
     @Autowired
     CoronaInfoMapper mapper;
+    
     public void insertCoronaInfo(CoronaInfoVO vo) {
         mapper.insertCoronaInfo(vo);
     }
@@ -53,4 +55,25 @@ public class CoronaInfoService {
 
         return data;
     }
+    
+    public void insertCoronaSidoInfo(CoronaSidoInfoVO vo) {
+        mapper.insertCoronaSidoInfo(vo);
+    }
+    public CoronaSidoInfoVO selectTodayCoronaSidoInfo() {
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String date = formatter.format(now);
+
+        CoronaSidoInfoVO data = mapper.selectCoronaSidoInfoByDate(date);
+
+        Integer isolClearCnt = data.getIsolClearCnt();
+
+        DecimalFormat dFormatter = new DecimalFormat("###,###");
+        String strIsolClearCnt = dFormatter.format(isolClearCnt);
+
+        data.setStrIsolClearCnt(strIsolClearCnt);
+
+        return data;
+    }
+
 }
