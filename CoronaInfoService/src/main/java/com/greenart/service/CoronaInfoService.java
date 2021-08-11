@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.greenart.mapper.CoronaInfoMapper;
+import com.greenart.vo.CoronaAgeInfoVO;
 import com.greenart.vo.CoronaInfoVO;
 import com.greenart.vo.CoronaSidoInfoVO;
 
@@ -90,5 +91,17 @@ public class CoronaInfoService {
 
         return data;
     }
+    public void insertCoronaAgeInfo(CoronaAgeInfoVO vo) {
+        mapper.insertCoronaAgeInfo(vo);
+    }
+    public CoronaAgeInfoVO selectTodayCoronaAgeInfo() {
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String date = formatter.format(now);
 
+        CoronaAgeInfoVO data = mapper.selectCoronaAgeInfoByDate(date);
+        
+        
+        return data;
+    }
 }

@@ -30,4 +30,17 @@
     <select id="selectCoronaSidoInfoByDate" resultType="com.greenart.vo.CoronaSidoInfoVO">
         select * from corona_sido where createDt >= str_to_date(#{date}, "%Y-%m-%d") LIMIT 1
     </select>
+    <insert id="insertCoronaAgeInfo">
+        INSERT INTO corona_age
+        (
+            gubun, confCase, death, confCaseRate, deathRate, criticalRate, createDt
+        )
+        VALUES
+        (
+            #{gubun}, #{confCase}, #{death}, #{confCaseRate}, #{deathRate}, #{criticalRate}, #{createDt}
+        );
+    </insert>
+    <select id="selectCoronaAgeInfoByDate" resultType="com.greenart.vo.CoronaAgeInfoVO">
+        select * from corona_age where createDt >= str_to_date(#{date}, "%Y-%m-%d") LIMIT 1
+    </select>
 </mapper>

@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.greenart.service.CoronaInfoService;
+import com.greenart.vo.CoronaAgeInfoVO;
 import com.greenart.vo.CoronaInfoVO;
 import com.greenart.vo.CoronaSidoInfoVO;
 
@@ -22,6 +23,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import ch.qos.logback.core.net.SyslogOutputStream;
 
 @RestController
 public class CoronaAPIController {
@@ -187,6 +190,79 @@ public class CoronaAPIController {
         resultMap.put("status", true);
         resultMap.put("message", "데이터가 연결되었습니다.");
         return resultMap;
-} 
+}
+        @GetMapping("/api/coronaSido/{date}")
+        public Map<String, Object> getCoronaSidoInfo(
+            @PathVariable String date
+        ) {
+            Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+            CoronaSidoInfoVO data = null;
+            // /api/coronaInfo/today = 오늘(today) 데이터를 내어줌
+            if(date.equals("today")) {
+                data = service.selectTodayCoronaSidoInfo();
+            }
 
+            resultMap.put("status", true);
+            resultMap.put("data", data);
+            
+            return resultMap;
+        }
+
+    
+    @GetMapping("/api/corona/age")
+    public Map<String, Object> getCoronaAgeInfo(
+        @RequestParam String startDt, @RequestParam String endDt
+    ) throws Exception{
+        Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+        StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19GenAgeCaseInfJson"); /*URL*/
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=3CID6KRU4kjF4jvHanoFBLwycg6Htt86aVfgEOgBmAecshZIcO5EC9UM9FhVGwAX2Zf%2B%2FrxgsJeUfled1zNS0w%3D%3D"); /*Service Key*/
+        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(startDt, "UTF-8")); /*검색할 생성일 범위의 시작*/
+        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode(endDt, "UTF-8")); /*검색할 생성일 범위의 종료*/
+    
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.parse(urlBuilder.toString());
+
+        doc.getDocumentElement().normalize();
+        NodeList nList = doc.getElementsByTagName("item");
+        if(nList.getLength() <= 0) {
+            resultMap.put("status", false);
+            resultMap.put("message", "데이터가 없습니다.");
+            return resultMap;
+        }
+        // System.out.println("size : "+nList.getLength());
+        
+        for(int j=0; j<nList.getLength(); j++) {
+            Node node = nList.item(j);
+            Element elem = (Element) node;
+
+            // System.out.println(getTagValue("gubun", elem));
+            // System.out.println(getTagValue("confCase", elem));
+            // System.out.println(getTagValue("death", elem));
+            // System.out.println(getTagValue("confCaseRate", elem));
+            // System.out.println(getTagValue("deathRate", elem));
+            // System.out.println(getTagValue("criticalRate", elem));
+            // System.out.println(getTagValue("createDt", elem));
+            // System.out.println("======================================================");
+            Date dt = new Date();
+            SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            dt = dtFormat.parse(getTagValue("createDt", elem));
+
+            CoronaAgeInfoVO vo = new CoronaAgeInfoVO();
+            vo.setCreateDt(dt);
+            vo.setGubun(getTagValue("gubun", elem));
+            vo.setConfCase(Integer.parseInt(getTagValue("confCase", elem)));
+            vo.setDeath(Integer.parseInt(getTagValue("death", elem)));
+            vo.setConfCaseRate(Double.parseDouble(getTagValue("confCaseRate", elem)));
+            vo.setDeathRate(Double.parseDouble(getTagValue("deathRate", elem)));
+            vo.setCriticalRate(Double.parseDouble(getTagValue("criticalRate", elem)));
+
+            service.insertCoronaAgeInfo(vo);
+        }
+        resultMap.put("status", true);
+        resultMap.put("message", "데이터가 연결되었습니다.");
+        return resultMap;
+    }
 }
