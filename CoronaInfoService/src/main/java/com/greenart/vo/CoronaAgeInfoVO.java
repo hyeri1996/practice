@@ -10,8 +10,5 @@ public class CoronaAgeInfoVO {
     private String gubun;
     private Integer confCase;
     private Integer death;
-    private Double confCaseRate;
-    private Double deathRate;
-    private Double criticalRate;
     private Date createDt;
 }

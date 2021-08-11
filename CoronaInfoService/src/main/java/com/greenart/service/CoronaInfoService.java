@@ -84,19 +84,30 @@ public class CoronaInfoService {
     }
 
 
-
-
     public void insertCoronaAgeInfo(CoronaAgeInfoVO vo) {
         mapper.insertCoronaAgeInfo(vo);
     }
-    public CoronaAgeInfoVO selectTodayCoronaAgeInfo() {
-        Date now = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String date = formatter.format(now);
 
-        CoronaAgeInfoVO data = mapper.selectCoronaAgeInfoByDate(date);
+    public List<CoronaAgeInfoVO> selectTodayCoronaAgeInfo() {
+        Calendar now = Calendar.getInstance();
+        Calendar standard = Calendar.getInstance();
+        standard.set(Calendar.HOUR_OF_DAY, 10);
+        standard.set(Calendar.MINUTE, 30);
+        standard.set(Calendar.SECOND, 20);
+
+        if(now.getTimeInMillis() < standard.getTimeInMillis()) {
+            // 현재 접속시간이 기준시간 (10시 30분 30초) 보다 이전일 때
+            // 하루 이전 날짜로 변경
+            now.add(Calendar.DATE, -1);
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dt = formatter.format(now.getTime());
         
-        
-        return data;
+        return mapper.selectCoronaAgeInfo(dt);
     }
+
+    public List<CoronaAgeInfoVO> selectCoronaAgeInfo(String date) {
+        return mapper.selectCoronaAgeInfo(date);
+    }
+
 }
