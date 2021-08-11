@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import com.greenart.mapper.CoronaInfoMapper;
 import com.greenart.vo.CoronaAgeInfoVO;
@@ -60,37 +61,31 @@ public class CoronaInfoService {
     public void insertCoronaSidoInfo(CoronaSidoInfoVO vo) {
         mapper.insertCoronaSidoInfo(vo);
     }
-    public CoronaSidoInfoVO selectTodayCoronaSidoInfo() {
-        Date now = new Date();
+    public List<CoronaSidoInfoVO> selectTodayCoronaSidoInfo() {
+        Calendar now = Calendar.getInstance();
+        Calendar standard = Calendar.getInstance();
+        standard.set(Calendar.HOUR_OF_DAY, 10);
+        standard.set(Calendar.MINUTE, 30);
+        standard.set(Calendar.SECOND, 10);
+
+        if(now.getTimeInMillis() < standard.getTimeInMillis()) {
+            // 현재 접속시간이 기준시간 (10시 30분 10초) 보다 이전일 때
+            // 하루 이전 날짜로 변경
+            now.add(Calendar.DATE, -1);
+        }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String date = formatter.format(now);
-
-        CoronaSidoInfoVO data = mapper.selectCoronaSidoInfoByDate(date);
-
-        Integer deathCnt = data.getDeathCnt();
-        Integer defcnt = data.getDefCnt();
-        Integer incDec = data.getIncDec();
-        Integer isolClearCnt = data.getIsolClearCnt();
-        Integer isolIngCnt = data.getIsolIngCnt();
-        Integer localOccCnt = data.getLocalOccCnt();
-
-        DecimalFormat dFormatter = new DecimalFormat("###,###");
-        String strDeathCnt = dFormatter.format(deathCnt);
-        String strDefCnt = dFormatter.format(defcnt);
-        String strIncDec = dFormatter.format(incDec);
-        String strIsolClearCnt = dFormatter.format(isolClearCnt);
-        String strIsolIngCnt = dFormatter.format(isolIngCnt);
-        String strLocalOccCnt = dFormatter.format(localOccCnt);
+        String dt = formatter.format(now.getTime());
         
-        data.setStrDeathCnt(strDeathCnt);
-        data.setStrDefCnt(strDefCnt);
-        data.setStrIncDec(strIncDec);
-        data.setStrIsolClearCnt(strIsolClearCnt);
-        data.setStrIsolIngCnt(strIsolIngCnt);
-        data.setStrLocalOccCnt(strLocalOccCnt);
-
-        return data;
+        return mapper.selectCoronaSidoInfo(dt);
     }
+
+    public List<CoronaSidoInfoVO> selectCoronaSidoInfo(String date) {
+        return mapper.selectCoronaSidoInfo(date);
+    }
+
+
+
+
     public void insertCoronaAgeInfo(CoronaAgeInfoVO vo) {
         mapper.insertCoronaAgeInfo(vo);
     }

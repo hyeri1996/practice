@@ -27,8 +27,10 @@
         #{incDec}, #{isolClearCnt}, #{isolIngCnt}, #{localOccCnt}, #{overFlowCnt}
     );
     </insert>
-    <select id="selectCoronaSidoInfoByDate" resultType="com.greenart.vo.CoronaSidoInfoVO">
-        select * from corona_sido where createDt >= str_to_date(#{date}, "%Y-%m-%d") LIMIT 1
+    <select id="selectCoronaSidoInfo" resultType="com.greenart.vo.CoronaSidoInfoVO">
+        select * from corona_sido 
+        where date_format(createDt, "%Y-%m-%d") = str_to_date(#{date}, "%Y-%m-%d")
+        and gubun != '합계'
     </select>
     <insert id="insertCoronaAgeInfo">
         INSERT INTO corona_age

@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -134,7 +135,7 @@ public class CoronaAPIController {
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=3CID6KRU4kjF4jvHanoFBLwycg6Htt86aVfgEOgBmAecshZIcO5EC9UM9FhVGwAX2Zf%2B%2FrxgsJeUfled1zNS0w%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("100000", "UTF-8")); /*한 페이지 결과 수*/
         urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(startDt, "UTF-8")); /*검색할 생성일 범위의 시작*/
         urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode(endDt, "UTF-8")); /*검색할 생성일 범위의 종료*/
     
@@ -191,24 +192,23 @@ public class CoronaAPIController {
         resultMap.put("message", "데이터가 연결되었습니다.");
         return resultMap;
 }
-        @GetMapping("/api/coronaSido/{date}")
-        public Map<String, Object> getCoronaSidoInfo(
-            @PathVariable String date
-        ) {
-            Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
-            CoronaSidoInfoVO data = null;
-            // /api/coronaInfo/today = 오늘(today) 데이터를 내어줌
-            if(date.equals("today")) {
-                data = service.selectTodayCoronaSidoInfo();
-            }
 
+    @GetMapping("/api/coronaSidoInfo/{date}")
+    public Map<String, Object> getCoronaSidoInfo(@PathVariable String date) {
+        Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+        if(date.equals("today")) {
+            List<CoronaSidoInfoVO> list = service.selectTodayCoronaSidoInfo();
             resultMap.put("status", true);
-            resultMap.put("data", data);
-            
-            return resultMap;
+            resultMap.put("data", list);
         }
+        else {
+            List<CoronaSidoInfoVO> list = service.selectCoronaSidoInfo(date);
+            resultMap.put("status", true);
+            resultMap.put("data", list);
+        }
+        return resultMap;
+    }
 
-    
     @GetMapping("/api/corona/age")
     public Map<String, Object> getCoronaAgeInfo(
         @RequestParam String startDt, @RequestParam String endDt
