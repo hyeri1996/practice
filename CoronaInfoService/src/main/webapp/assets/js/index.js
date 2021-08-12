@@ -115,31 +115,85 @@ $(function () {
     //         ]
     //     }
     // })
-
-    let ctx3 = $("#vaccine_chart");
-    let vaccineChart = new Chart(ctx3, {
-        type: 'bar',
-        options: {
-            responsive: false
-        },
-        data: {
-            labels: ['서울', '경기', '대구', '인천', '부산', '경남', '경북', '충남', '강원', '대전', '충북', '광주', '울산', '전북', '전남', '제주', '세종'],
-            datasets: [{
-                    label: strDate+" 1차 접종현황",
-                    data: [415, 408, 86, 65, 123, 88, 30, 68, 24, 42, 39, 19, 25, 21, 14, 11, 1],
-                    backgroundColor: ['rgb(118, 210, 192)']
+    $.ajax({
+        type: "get",
+        url: "/api/corona/vaccine/today",
+        success: function (r) {
+            console.log(r);
+            let sidoName = new Array();
+            let todayfirstCnt = new Array();
+            let todaysecondCnt = new Array();
+    
+            for (let i = 0; i < r.data.length; i++) {
+                let sido = r.data[i].sido;
+                let firstCnt = r.data[i].firstCnt
+                let secondCnt = r.data[i].secondCnt
+    
+                sidoName.push(sido);
+                todayfirstCnt.push(firstCnt);
+                todaysecondCnt.push(secondCnt);
+            }
+            let ctx3 = $("#vaccine_chart");
+            let vaccineChart = new Chart(ctx3, {
+                type: 'line',
+                options: {
+                    responsive: false
                 },
-                {
-                    label: strDate+" 2차 접종현황",
-                    data: [415, 408, 86, 65, 123, 88, 30, 68, 24, 42, 39, 19, 25, 21, 14, 11, 1],
-                    backgroundColor: ['rgb(69, 160, 142)']
+                data: {
+                    labels: sidoName,
+                    datasets: [{
+                            label: strDate+" 1차 접종현황",
+                            data: todayfirstCnt,
+                            backgroundColor: ['rgb(118, 210, 192)']
+                        },
+                        {
+                            label: strDate+" 2차 접종현황",
+                            data: todaysecondCnt,
+                            backgroundColor: ['rgb(69, 160, 142)']
+                        }
+                    ]
                 }
-            ]
+            });
+        }
+    })
+        $.ajax({
+            type: "get",
+            url: "/api/corona/gen/today",
+            success: function (r) {
+                console.log(r);
+                let genName = new Array();
+                let confirmed = new Array();
+    
+    
+                for (let i = 0; i < r.data.length; i++) {
+                    let gen = r.data[i].gubun;
+                    let confirmedCnt = r.data[i].confCase;
+    
+    
+                    genName.push(gen);
+                    confirmed.push(confirmedCnt);
+                }
+            let ctx4 = $("#gen_confirm_status");
+            let genChart = new Chart(ctx4, {
+                type: 'pie',
+                options: {
+                    responsive: false
+                },
+                data: {
+                    labels: genName,
+                    datasets: [{
+                        label: ["남성/여성"],
+                        data: confirmed,
+                        backgroundColor: ["rgb(139, 189, 255)", "rgb(235, 237, 255)"]
+                    }]
+                }
+            })
+            
         }
     });
     $.ajax({
         type: "get",
-        url: "/api/coronaAgeInfo/today",
+        url: "/api/corona/age/today",
         success: function (r) {
             console.log(r);
             let ageName = new Array();
@@ -154,41 +208,7 @@ $(function () {
                 ageName.push(age);
                 confirmed.push(confirmedCnt);
             }
-            let ctx4 = $("#age_confirm_status");
-            let ageChart = new Chart(ctx4, {
-                type: 'bar',
-                options: {
-                    responsive: false
-                },
-                data: {
-                    labels: ageName,
-                    datasets: [{
-                            label:strDate+" 누적 확진자 수",
-                            data: confirmed,
-                            backgroundColor: ['#87D0F2']
-                        }
-                    ]
-                }
-            })
-            
-        }
-    })
-    $.ajax({
-        type: "get",
-        url: "/api/coronaAgeInfo/today",
-        success: function (r) {
-            console.log(r);
-            let ageName = new Array();
-            let death = new Array();
-
-            for (let i = 0; i < r.data.length; i++) {
-                let age = r.data[i].gubun;
-                let deathCnt = r.data[i].death
-
-                ageName.push(age);
-                death.push(deathCnt);
-            }
-            let ctx5 = $("#age_death_status");
+            let ctx5 = $("#age_confirm_status");
             let ageChart = new Chart(ctx5, {
                 type: 'bar',
                 options: {
@@ -197,17 +217,85 @@ $(function () {
                 data: {
                     labels: ageName,
                     datasets: [{
-                            label:strDate+" 신규 사망자 수",
-                            data: death,
-                            backgroundColor: ['rgb(255, 153, 153)']
+                            label:strDate+" 연령별 누적 확진자 수",
+                            data: confirmed,
+                            backgroundColor: ['#87D0F2']
                         }
                     ]
                 }
             })
         }
-    })
-})
+    });
+    $.ajax({
+        type: "get",
+        url: "/api/corona/gen/today",
+        success: function (r) {
+            console.log(r);
+            let genName = new Array();
+            let death = new Array();
+
+
+            for (let i = 0; i < r.data.length; i++) {
+                let gen = r.data[i].gubun;
+                let deathCnt = r.data[i].death
+
+
+                genName.push(gen);
+                death.push(deathCnt);
+            }
+        let ctx6 = $("#gen_death_status");
+        let genChart = new Chart(ctx6, {
+            type: 'pie',
+            options: {
+                responsive: false
+            },
+            data: {
+                labels: genName,
+                datasets: [{
+                    label: ["남성/여성"],
+                    data: death,
+                    backgroundColor: ["rgb(237,149,149)", "rgb(250, 224, 212)"]
+                }]
+            }
+        })
+        
+    }
+});
+$.ajax({
+    type: "get",
+    url: "/api/corona/age/today",
+    success: function (r) {
+        console.log(r);
+        let ageName = new Array();
+        let death = new Array();
+
+        for (let i = 0; i < r.data.length; i++) {
+            let age = r.data[i].gubun;
+            let deathCnt = r.data[i].death
+
+            ageName.push(age);
+            death.push(deathCnt);
+        }
+        let ctx7 = $("#age_death_status");
+        let ageChart = new Chart(ctx7, {
+            type: 'bar',
+            options: {
+                responsive: false
+            },
+            data: {
+                labels: ageName,
+                datasets: [{
+                        label:strDate+" 연령별 신규 사망자 수",
+                        data: death,
+                        backgroundColor: ['rgb(255, 153, 153)']
+                    }
+                ]
+            }
+        })
+    }
+});
 
 function leadingZero(n) {
     return n<10?"0"+n:""+n;
 }
+})
