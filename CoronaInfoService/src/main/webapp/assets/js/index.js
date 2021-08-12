@@ -135,9 +135,9 @@ $(function () {
             }
             let ctx3 = $("#vaccine_chart");
             let vaccineChart = new Chart(ctx3, {
-                type: 'line',
+                type: 'bar',
                 options: {
-                    responsive: false
+                    responsive: false,
                 },
                 data: {
                     labels: sidoName,
