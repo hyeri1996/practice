@@ -114,18 +114,18 @@
                 </div>
             </div>
             <div class="dashboard_content">
-                <div class="content_left age_confirmed">
+                <div class="content_left">
                     <canvas id="gen_confirm_status" style="width:100%; height:100%"></canvas>
                 </div>
-                <div class="content_right age_deathCnt">
+                <div class="content_right">
                     <canvas id="age_confirm_status" style="width:100%; height:100%"></canvas>
                 </div>
             </div>
             <div class="dashboard_content">
-                <div class="content_left age_confirmed">
+                <div class="content_left">
                     <canvas id="gen_death_status" style="width:100%; height:100%"></canvas>
                 </div>
-                <div class="content_right age_deathCnt">
+                <div class="content_right">
                     <canvas id="age_death_status" style="width:100%; height:100%"></canvas>
                 </div>
             </div>
