@@ -132,7 +132,7 @@ public class CoronaInfoComponent {
     }
     
     // 매일 14:50:00에 한 번 실행
-    @Scheduled(cron = "0 50 14 * * *")
+    @Scheduled(cron = "0 0 16 * * *")
     public void getCoronaAgeInfo() throws Exception{
         Date dt = new Date(); // 현재시간
         SimpleDateFormat dtFormatter = new SimpleDateFormat("YYYYMMdd");

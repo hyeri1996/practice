@@ -17,4 +17,5 @@ public class CoronaSidoInfoVO {
     private Integer localOccCnt;
     private Integer overFlowCnt;
 
+    private Integer diff;
 }
