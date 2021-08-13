@@ -156,7 +156,7 @@ public class CoronaInfoService {
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dt = formatter.format(now.getTime());
-        
+        System.out.println(mapper.selectCoronaVaccineInfo(dt));
         return mapper.selectCoronaVaccineInfo(dt);
     }
     public List<CoronaVaccineInfoVO> selectCoronaVaccineInfo(String date) {

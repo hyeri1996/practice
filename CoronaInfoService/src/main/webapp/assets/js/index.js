@@ -119,19 +119,17 @@ $(function () {
         type: "get",
         url: "/api/corona/vaccine/today",
         success: function (r) {
+            console.log("백신정보");
             console.log(r);
-            let sidoName = new Array();
-            let todayfirstCnt = new Array();
-            let todaysecondCnt = new Array();
+            let regionArr = new Array();
+            let firstArr = new Array();
+            let secondArr = new Array();
     
             for (let i = 0; i < r.data.length; i++) {
-                let sido = r.data[i].sido;
-                let firstCnt = r.data[i].firstCnt
-                let secondCnt = r.data[i].secondCnt
+                regionArr.push(r.data[i].region);
+                firstArr.push(r.data[i].firstCnt);
+                secondArr.push(r.data[i].secondCnt);
     
-                sidoName.push(sido);
-                todayfirstCnt.push(firstCnt);
-                todaysecondCnt.push(secondCnt);
             }
             let ctx3 = $("#vaccine_chart");
             let vaccineChart = new Chart(ctx3, {
@@ -140,15 +138,15 @@ $(function () {
                     responsive: false,
                 },
                 data: {
-                    labels: sidoName,
+                    labels: regionArr,
                     datasets: [{
                             label: strDate+" 1차 접종현황",
-                            data: todayfirstCnt,
+                            data: firstArr,
                             backgroundColor: ['rgb(118, 210, 192)']
                         },
                         {
                             label: strDate+" 2차 접종현황",
-                            data: todaysecondCnt,
+                            data: secondArr,
                             backgroundColor: ['rgb(69, 160, 142)']
                         }
                     ]
