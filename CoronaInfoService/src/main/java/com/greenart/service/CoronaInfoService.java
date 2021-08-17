@@ -42,11 +42,25 @@ public class CoronaInfoService {
         // 현재 시간이 세팅값보다 이전이라면 , 전 날 데이터를 뽑아주고
         // 현재 시간이 세팅값 이전이면 시간 데이터가 null로 표시 되기때문에 전날 데이터를 뽑음
         // 현재시간이 세팅값보다 나중이라면, 오늘 데이터를 뽑아준다.
-        Date now = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String date = formatter.format(now);
+        Calendar now = Calendar.getInstance();
+        Calendar standard = Calendar.getInstance();
+        standard.set(Calendar.HOUR_OF_DAY, 10);
+        standard.set(Calendar.MINUTE, 30);
+        standard.set(Calendar.SECOND, 00);
 
-        CoronaInfoVO data = mapper.selectCoronaInfoByDate(date);
+        if(now.getTimeInMillis() < standard.getTimeInMillis()) {
+            // 현재 접속시간이 기준시간 (10시 30분) 보다 이전일 때
+            // 하루 이전 날짜로 변경
+            now.add(Calendar.DATE, -1);
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dt = formatter.format(now.getTime());
+
+        // Date now = new Date();
+        // SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        // String date = formatter.format(now);
+
+        CoronaInfoVO data = mapper.selectCoronaInfoByDate(dt);
 
         Integer accExamCnt = data.getAccExamCnt();
         Integer decideCnt = data.getDecideCnt();
